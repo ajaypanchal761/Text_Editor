@@ -1,0 +1,214 @@
+package LetsGrowMore;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.xml.bind.Marshaller.Listener;
+
+import javafx.collections.ListChangeListener.Change;
+
+public class Text_Editor implements ActionListener
+{
+    JFrame frame;
+    JTextArea textarea;
+    JMenu file , edit;
+    JMenuBar menubar;
+    JMenuItem f1,f2,f3,f4;
+    JMenuItem e1,e2,e3;
+    JSpinner spinner;
+    JButton CButton;
+    JComboBox fb;
+    JLabel fontLabel;
+     JFileChooser f_Chooser;
+ 
+    Text_Editor()
+    {
+        frame = new JFrame("Text Editor");
+
+        menubar= new JMenuBar();
+        file = new JMenu("File");
+        edit = new JMenu("Edit");
+        textarea = new JTextArea();
+        textarea.setBounds(50, 50, 400, 400);
+        textarea.setPreferredSize(new Dimension(450,450));
+        textarea.setLineWrap(true);
+        textarea.setWrapStyleWord(true);
+        textarea.setFont(new Font("Arial",Font.PLAIN,20));
+
+        
+        f1= new JMenuItem("New");
+        f2= new JMenuItem("Open");
+        f3= new JMenuItem("Save");
+        f4=new JMenuItem("EXIT");
+        
+
+        e1= new JMenuItem("Cut");
+        e2= new JMenuItem("Copy");
+        e3= new JMenuItem("Paste");
+
+        
+
+        file.add(f1);
+        file.add(f2);
+        file.add(f3);
+        file.add(f4);
+      
+        menubar.add(file);
+        frame.setJMenuBar(menubar);
+
+        edit.add(e1);
+        edit.add(e2);
+        edit.add(e3);
+        menubar.add(edit);
+
+        fontLabel = new JLabel("Font: ");
+
+        SpinnerModel value = new SpinnerNumberModel(5,0 ,100 ,1 );
+        spinner = new JSpinner(value);
+        spinner.setBounds(100,10,50,30);
+        spinner.setPreferredSize(new Dimension(50,25));
+  
+        spinner.addChangeListener(new ChangeListener() {
+
+            
+            public void stateChanged(ChangeEvent e) {
+                
+                textarea.setFont(new Font(textarea.getFont().getFamily(),Font.PLAIN,(int)spinner.getValue()));
+            }
+            
+            
+        });
+                f1.addActionListener(this);
+                f2.addActionListener(this);
+                f3.addActionListener(this);
+
+               
+               String[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+                
+                fb = new JComboBox(fonts);
+                fb.setBounds(180, 12, 100, 25);
+                fb.addActionListener(this);
+                fb.setSelectedItem("Arial");
+
+
+               
+
+        
+         
+
+                CButton = new JButton("Color");
+               CButton.setBounds(300,12,100,25);
+               CButton.addActionListener(this);
+
+
+       frame.add(fontLabel);
+        frame.add(spinner);
+         frame.add(CButton);
+        frame.add(fb);
+       
+        frame.add(textarea);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(500, 500);
+        frame.setLayout(null);
+        frame.setVisible(true);
+        
+
+    }
+    public static void main(String args[])
+    {
+        new Text_Editor();
+    }
+     public void actionPerformed(ActionEvent ex)
+    {
+
+        if(ex.getSource() == CButton) {
+        JColorChooser chooser = new JColorChooser();   
+        Color initilColor = Color.BLACK;
+        Color c = chooser.showDialog(null, "Select a Color", initilColor);
+        textarea.setForeground(initilColor);
+  }
+
+  
+  if(ex.getSource() == fb) {
+   textarea.setFont(new Font((String)fb.getSelectedItem(),Font.PLAIN,textarea.getFont().getSize()));
+  }
+  
+
+
+  if(ex.getSource() ==f2 ) {
+   JFileChooser fileChooser = new JFileChooser();
+   fileChooser.setCurrentDirectory(new File("."));
+   FileNameExtensionFilter fltr = new FileNameExtensionFilter("Text files", "txt");
+   fileChooser.setFileFilter(fltr);
+
+
+   
+ if(ex.getSource()==f2)
+        {
+            
+           
+            int i=f_Chooser.showOpenDialog(null);
+            if(i==JFileChooser.APPROVE_OPTION)
+            {
+                File f = f_Chooser.getSelectedFile();
+                String filepath = f.getPath();
+                try
+                {
+                    BufferedReader br = new BufferedReader(new FileReader(filepath));
+                    String s1 = "",s2="";
+                    while((s1=br.readLine())!=null)
+                    {
+                        s2+=s1+"\n";
+                    }
+                    textarea.setText(s2);
+                    br.close();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+    
+  }
+  if(ex.getSource()==f3) {
+   JFileChooser f_Chooser = new JFileChooser();
+   f_Chooser.setCurrentDirectory(new File("."));
+   
+   int response = f_Chooser.showSaveDialog(null);
+   
+   if(response == JFileChooser.APPROVE_OPTION) {
+    File file;
+    PrintWriter fileOut = null;
+    
+    file = new File(f_Chooser.getSelectedFile().getAbsolutePath());
+    try {
+     fileOut = new PrintWriter(file);
+     fileOut.println(textarea.getText());
+    } 
+    catch (FileNotFoundException e1) {
+     e1.printStackTrace();
+    }
+    finally {
+     fileOut.close();
+    }   
+   }
+  }
+  if(ex.getSource()==f4) {
+   System.exit(0);
+  }  
+ }
+
+    }
+
+    
